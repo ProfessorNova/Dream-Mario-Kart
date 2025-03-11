@@ -1,0 +1,6 @@
+ppo/checkpoints
+ppo/logs
+ppo/videos
+sd/data
+sd/output_autoencoder
+sd/output_sd
