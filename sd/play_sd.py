@@ -57,15 +57,12 @@ class TrajectoryDataset(Dataset):
 def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    encoder = torch.load("output_autoencoder/encoder.pt", weights_only=False).to(device)
-    decoder = torch.load("output_autoencoder/decoder.pt", weights_only=False).to(device)
-    encoder.eval()
-    decoder.eval()
-
     script_dir = os.path.dirname(__file__)
-    latent_shape = (8, 56, 64)
-    image_shape = (3, 224, 256)
-    dataset = TrajectoryDataset(os.path.join(script_dir, "data", "trajectories.npz"), encoder, SEQUENCE_LENGTH, device)
+    latent_shape = (4, 28, 64)
+    image_shape = (3, 112, 256)
+
+    decoder = torch.load(os.path.join(script_dir, "pretrained", "decoder.pt"), weights_only=False).to(device)
+    decoder.eval()
 
     model = UNet(
         in_shape=latent_shape,
@@ -83,11 +80,13 @@ def main():
         device=device
     )
     ema_model.load_state_dict(
-        torch.load(os.path.join(script_dir, "output_sd", "best.pt"), map_location=device, weights_only=True))
+        torch.load(os.path.join(script_dir, "pretrained", "model.pt"), map_location=device, weights_only=True))
     print("Model loaded successfully!")
 
-    frame_buffer = dataset[0][0].to(device).unsqueeze(0)
-    action_buffer = dataset[0][1].to(device).unsqueeze(0)
+    # Load the initial sequence
+    initial_sequence = np.load(os.path.join(script_dir, "pretrained", "initial_sequence.npz"))
+    frame_buffer = torch.tensor(initial_sequence["frames"], dtype=torch.float32).to(device)
+    action_buffer = torch.tensor(initial_sequence["actions"], dtype=torch.long).to(device)
 
     pygame.init()
     display_width = image_shape[2] * 4
@@ -121,7 +120,7 @@ def main():
             start_time = time.time()
             generated_frame = generate(ema_model,
                                        1,
-                                       8,
+                                       7,
                                        latent_shape,
                                        frame_buffer,
                                        action_buffer,

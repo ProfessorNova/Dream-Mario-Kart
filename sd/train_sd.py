@@ -74,6 +74,13 @@ def main():
     def train_diffusion_model(model, ema_model, loader, optimizer, decoder, device, epochs=50, max_noise_level=0.15,
                               output_dir=os.path.join(script_dir, "output_sd")):
         os.makedirs(output_dir, exist_ok=True)
+
+        # Save an initial sequence for later inference
+        initial_sequence_frame_buffer = dataset[0][0].unsqueeze(0).cpu().numpy()
+        initial_sequence_action_buffer = dataset[0][1].unsqueeze(0).cpu().numpy()
+        np.savez(os.path.join(output_dir, "initial_sequence.npz"), frames=initial_sequence_frame_buffer,
+                 actions=initial_sequence_action_buffer)
+
         criterion = torch.nn.MSELoss()
 
         # Use gradient scaling to prevent underflow
@@ -187,7 +194,7 @@ def main():
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5, patience=3)
 
     # Start training
-    train_diffusion_model(model, ema_model, loader, optimizer, decoder, device, epochs=500)
+    train_diffusion_model(model, ema_model, loader, optimizer, decoder, device, epochs=300)
 
 
 if __name__ == "__main__":

@@ -21,7 +21,7 @@ def parse_args():
     parser.add_argument("--cuda", default=True if torch.cuda.is_available() else False, action="store_true",
                         help="Use CUDA")
     parser.add_argument("--n-envs", type=int, default=16, help="Number of environments")
-    parser.add_argument("--n-epochs", type=int, default=100, help="Number of epochs to run")
+    parser.add_argument("--n-epochs", type=int, default=150, help="Number of epochs to run")
     parser.add_argument("--n-steps", type=int, default=512, help="Number of steps per epoch per environment")
     parser.add_argument("--batch-size", type=int, default=512, help="Batch size")
     parser.add_argument("--train-iters", type=int, default=20, help="Number of training iterations")
@@ -35,7 +35,7 @@ def parse_args():
                         help="Path to a model checkpoint")
     parser.add_argument("--recording-start", type=int, default=0,
                         help="Start recording after this epoch")
-    parser.add_argument("--recording-end", type=int, default=100,
+    parser.add_argument("--recording-end", type=int, default=150,
                         help="End recording after this epoch")
     assert 0 <= parser.parse_args().recording_start <= parser.parse_args().recording_end
     assert parser.parse_args().recording_start <= parser.parse_args().n_epochs

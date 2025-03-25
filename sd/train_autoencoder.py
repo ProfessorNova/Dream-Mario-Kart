@@ -142,15 +142,15 @@ def main():
                     break
 
     # Init everything
-    encoder = Encoder(3, 8).to(device)
-    decoder = Decoder(3, 8).to(device)
+    encoder = Encoder(3, 4).to(device)
+    decoder = Decoder(3, 4).to(device)
     optimizer = torch.optim.AdamW(list(encoder.parameters()) + list(decoder.parameters()), lr=1e-3, weight_decay=1e-4)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", factor=0.5, patience=3)
     print(encoder)
     print(decoder)
 
     # Train the autoencoder
-    train_autoencoder(encoder, decoder, train_loader, val_loader, optimizer, device)
+    train_autoencoder(encoder, decoder, train_loader, val_loader, optimizer, device, epochs=100)
 
 
 if __name__ == "__main__":

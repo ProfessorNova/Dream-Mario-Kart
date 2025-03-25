@@ -9,7 +9,7 @@ from torch.distributions import Categorical
 SKIP_FRAME = 8
 
 
-def log_video(env, agent, device, video_path, fps=30):
+def log_video(env, agent, device, video_path, fps=60):
     """
     Log a video of one episode of the agent playing in the environment.
     :param env: a test environment which supports video recording and doesn't conflict with the other environments.
@@ -50,7 +50,9 @@ def log_video(env, agent, device, video_path, fps=30):
 
 def make_mario_kart_env(render_env=False):
     env = retro.make("SuperMarioKart-Snes")
+    # env = retro.make('SuperMarioKart-Snes', 'RainbowRoad_M')
     env = ActionWrapper(env)
+    env = ObservationWrapper(env)
     env = FrameStack(env, num_stack=3)
     if not render_env:
         env = SkipEnv(env, skip=SKIP_FRAME)
@@ -123,3 +125,24 @@ class ActionWrapper(gym.ActionWrapper):
         # Action 0 is implicitly a no-op (all zeros)
 
         return mapped_action
+
+
+class ObservationWrapper(gym.ObservationWrapper):
+    """
+    Gym ObservationWrapper to remove the lower part of the image.
+    """
+
+    def __init__(self, env):
+        super(ObservationWrapper, self).__init__(env)
+        self.original_image_size = env.observation_space.shape
+        self.observation_space = gym.spaces.Box(low=0, high=255, shape=(
+            self.original_image_size[0] // 2, self.original_image_size[1], self.original_image_size[2]
+        ), dtype=np.uint8)
+
+    def observation(self, obs):
+        """
+        Remove the lower part of the image.
+        :param obs: the original observation.
+        :return: the modified observation.
+        """
+        return obs[:self.original_image_size[0] // 2, :, :]

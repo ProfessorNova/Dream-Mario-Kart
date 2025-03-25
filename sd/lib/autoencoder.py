@@ -2,7 +2,7 @@ import torch.nn as nn
 
 
 class Encoder(nn.Module):
-    def __init__(self, in_channels, latent_channels=8):
+    def __init__(self, in_channels, latent_channels=4):
         super(Encoder, self).__init__()
         self.conv = nn.Sequential(
             nn.Conv2d(in_channels, 32, kernel_size=4, stride=2, padding=1),
@@ -17,7 +17,7 @@ class Encoder(nn.Module):
 
 
 class Decoder(nn.Module):
-    def __init__(self, out_channels, latent_channels=8):
+    def __init__(self, out_channels, latent_channels=4):
         super(Decoder, self).__init__()
         self.un_conv = nn.Sequential(
             nn.ConvTranspose2d(latent_channels, 64, kernel_size=3, stride=1, padding=1),
