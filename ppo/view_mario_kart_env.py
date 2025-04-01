@@ -12,7 +12,7 @@ def main():
     time_per_frame = 1.0 / frame_rate
 
     try:
-        for step in range(5000):
+        for step in range(60):
             start_time = time.time()
 
             if done:
@@ -31,6 +31,10 @@ def main():
             # Calculate the time taken for the frame and sleep for the remaining time
             elapsed_time = time.time() - start_time
             time.sleep(max(0, time_per_frame - elapsed_time))
+
+            # Check for exit key
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
 
     finally:
         env.close()

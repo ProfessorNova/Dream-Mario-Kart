@@ -61,7 +61,7 @@ def main():
     latent_shape = (4, 28, 64)
     image_shape = (3, 112, 256)
 
-    decoder = torch.load(os.path.join(script_dir, "pretrained", "decoder.pt"), weights_only=False).to(device)
+    decoder = torch.load(os.path.join(script_dir, "pretrained", "decoder.pt"), map_location=device, weights_only=False)
     decoder.eval()
 
     model = UNet(
