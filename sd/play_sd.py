@@ -1,4 +1,4 @@
-import os
+import argparse
 import time
 
 import numpy as np
@@ -54,14 +54,23 @@ class TrajectoryDataset(Dataset):
         return self.data[idx]
 
 
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--decoder-path", type=str, default="pretrained/decoder.pt", help="Path to the decoder model.")
+    parser.add_argument("--model-path", type=str, default="pretrained/model.pt", help="Path to the diffusion model.")
+    parser.add_argument("--trajectory-path", type=str, default="pretrained/initial_sequence.npz",
+                        help="Path to the initial sequence to init the buffer.")
+    return parser.parse_args()
+
+
 def main():
+    args = parse_args()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    script_dir = os.path.dirname(__file__)
     latent_shape = (4, 28, 64)
     image_shape = (3, 112, 256)
 
-    decoder = torch.load(os.path.join(script_dir, "pretrained", "decoder.pt"), map_location=device, weights_only=False)
+    decoder = torch.load(args.decoder_path, map_location=device, weights_only=False)
     decoder.eval()
 
     model = UNet(
@@ -80,11 +89,11 @@ def main():
         device=device
     )
     ema_model.load_state_dict(
-        torch.load(os.path.join(script_dir, "pretrained", "model.pt"), map_location=device, weights_only=True))
+        torch.load(args.model_path, map_location=device, weights_only=True))
     print("Model loaded successfully!")
 
     # Load the initial sequence
-    initial_sequence = np.load(os.path.join(script_dir, "pretrained", "initial_sequence.npz"))
+    initial_sequence = np.load(args.trajectory_path)
     frame_buffer = torch.tensor(initial_sequence["frames"], dtype=torch.float32).to(device)
     action_buffer = torch.tensor(initial_sequence["actions"], dtype=torch.long).to(device)
 

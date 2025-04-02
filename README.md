@@ -35,7 +35,8 @@ The following steps were taken to create the model:
 
 If you want to try out the pretrained model, follow these steps:
 
-1. Clone the repository
+1. **Clone the repository**: Clone the repository to your local machine. You may need to set up git-lfs to download the
+   pretrained model.
     ```bash
     git clone https://github.com/ProfessorNova/Dream-Mario-Kart.git
     cd Dream-Mario-Kart
@@ -96,7 +97,7 @@ gym.
 
 5. Install the rest of the requirements.
     ```bash
-    pip install torch tensorboardX tqdm opencv-python
+    pip install torch torchvision tensorboardX tqdm opencv-python pygame
     ```
    For proper PyTorch installation, check the official [PyTorch website](https://pytorch.org/get-started/locally/) and
    follow the instructions based on your system configuration.
@@ -129,8 +130,26 @@ You will need to execute three training scripts in total.
     ```
 
 3. **Train the diffusion model**: This will train the diffusion model on the data collected by the PPO agent. The
-   trained model will be saved in the `output_diffusion` folder in the `sd` folder.
+   trained model will be saved in the automatic created `output_sd` folder in the `sd` folder.
     ```bash
     python train_sd.py
     ```
 
+4. **Inference**: After training, you can run the inference script to test your trained model. Call the `play_sd.py`
+   with the correct paths to the trained models and initial_sequence.
+    ```bash
+    python play_sd.py --decoder-path output_autoencoder/decoder.pt --model-path output_sd/best.pt --trajectory-path output_sd/initial_sequence.npz
+    ```
+
+5. **Try out other tracks or even games**: I welcome you to try out other tracks to train a diffusion model on. You can
+   simply modify the `ppo/lib/utils.py` file to change the track. You can find a commented example line for Rainbow
+   Road. If you want to try out other games you might need to modify the PPO agent a bit. But as soon as you have the
+   trajectories file the rest of the training should work without any problems.
+
+## Acknowledgements
+
+This project is based on the paper [DIFFUSION MODELS ARE REAL-TIME GAME ENGINES](https://arxiv.org/pdf/2408.14837) by
+Dani Valevski, Yaniv Leviathan, Moab Arar and Shlomi Fruchter.
+
+Thanks to the [esteveste/gym-SuperMarioKart-Snes](https://github.com/esteveste/gym-SuperMarioKart-Snes) repository for
+an easy integration of Super Mario Kart into gym-retro.
